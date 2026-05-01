@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iGCSE Study Plan – Today</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171e;
+    --surface2: #1e1e28;
+    --border: #2c2c3a;
+    --text: #eeeef5;
+    --muted: #6b6b80;
+    --accent: #ff6b47;
+
+    --english:  #ff6b6b;
+    --maths:    #6b9fff;
+    --biology:  #4ecf85;
+    --cs:       #a78bfa;
+    --dt:       #ffb347;
+    --history:  #f472b6;
+    --business: #38bdf8;
+    --spanish:  #fde68a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  header {
+    max-width: 680px;
+    margin: 0 auto 0.75rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    animation: fadeIn 0.6s ease both;
+    border-bottom: 2px solid var(--text);
+    padding-bottom: 1.2rem;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  header h1 em { font-style: normal; color: var(--accent); }
+
+  .date-display { text-align: right; }
+
+  .date-display .day-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .date-display .full-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .live-clock {
+    max-width: 680px;
+    margin: 0.9rem auto 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    animation: fadeIn 0.6s 0.05s ease both;
+  }
+
+  .clock-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.3rem 0.85rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .clock-pill span { color: var(--text); }
+
+  .session-badge {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 20px;
+    padding: 0.3rem 0.85rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .legend {
+    max-width: 680px;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    animation: fadeIn 0.6s 0.1s ease both;
+  }
+
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.25rem 0.7rem 0.25rem 0.4rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .day-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    animation: slideUp 0.5s 0.15s ease both;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .day-card.weekend .day-header { border-left: 4px solid var(--accent); }
+
+  .day-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .day-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .day-range {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    opacity: 0.5;
+    letter-spacing: 0.06em;
+  }
+
+  .blocks {
+    padding: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .sub-block {
+    border-radius: 9px;
+    border-left: 3px solid var(--c);
+    background: color-mix(in srgb, var(--c) 8%, var(--surface));
+    overflow: hidden;
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+
+  .sub-block.active-session {
+    background: color-mix(in srgb, var(--c) 18%, var(--surface));
+    box-shadow: 0 0 0 1.5px var(--c);
+  }
+
+  .now-label {
+    display: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.5rem;
+    color: var(--c);
+    opacity: 0.9;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .sub-block.active-session .now-label { display: inline; }
+
+  .sub-inner {
+    padding: 0.65rem 0.85rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .sub-info { flex: 1; min-width: 0; }
+
+  .sub-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .sub-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  .sub-note {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.56rem;
+    color: var(--c);
+    margin-top: 0.28rem;
+    opacity: 0.85;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .sub-note::before { content: '▸'; opacity: 0.7; }
+
+  .tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; flex-shrink: 0; }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.12rem 0.45rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .tag-learn {
+    background: color-mix(in srgb, var(--c) 15%, transparent);
+    color: var(--c);
+  }
+
+  .gap-block {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+  }
+
+  .gap-icon { font-size: 0.85rem; flex-shrink: 0; }
+
+  .gap-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex: 1;
+  }
+
+  .gap-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--border);
+  }
+
+  .footer-note {
+    max-width: 680px;
+    margin: 1.5rem auto 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.57rem;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.06em;
+    animation: fadeIn 0.6s 0.3s ease both;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 500px) {
+    .date-display { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>iGCSE<br><em>Today</em></h1>
+  <div class="date-display">
+    <span class="day-label" id="hdr-day"></span>
+    <span class="full-date" id="hdr-date"></span>
+  </div>
+</header>
+
+<div class="live-clock">
+  <div class="clock-pill">🕐 <span id="live-time">--:--:--</span></div>
+  <div class="session-badge" id="session-now">Loading…</div>
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--english)"></div>English</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--maths)"></div>Maths</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--biology)"></div>Biology</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--history)"></div>History</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--business)"></div>Business</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--spanish)"></div>Spanish</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--dt)"></div>Design & Tech</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--cs)"></div>Computer Sci</div>
+</div>
+
+<div class="day-wrap" id="day-wrap"></div>
+<div class="footer-note" id="footer-note"></div>
+
+<script>
+// ─── Data ─────────────────────────────────────────────────────────
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// Keyed by JS getDay() (0=Sun … 6=Sat)
+const SCHEDULE = {
+  1: ['maths',    'english',   'history'],
+  2: ['biology',  'business',  'spanish'],
+  3: ['biology',  'maths',     'cs'     ],
+  4: ['english',  'history',   'business'],
+  5: ['maths',    'biology',   'spanish'],
+  6: ['business', 'dt',        'history'],
+  0: ['english',  'dt',        'maths'  ],
+};
+
+const SUBJECT_META = {
+  english:  { label: 'English Lang & Lit',  cssVar: '--english'  },
+  maths:    { label: 'Mathematics',         cssVar: '--maths'    },
+  biology:  { label: 'Biology (Extended)',  cssVar: '--biology'  },
+  cs:       { label: 'Computer Science',    cssVar: '--cs'       },
+  dt:       { label: 'Design & Technology', cssVar: '--dt'       },
+  history:  { label: 'History',             cssVar: '--history'  },
+  business: { label: 'Business Studies',    cssVar: '--business' },
+  spanish:  { label: 'Spanish',             cssVar: '--spanish'  },
+};
+
+function getSessionDefs(isWeekend) {
+  return isWeekend ? [
+    { start: '10:00 AM', end: '1:00 PM',  sh: 10, sm: 0,  eh: 13, em: 0 },
+    { start: '2:00 PM',  end: '5:00 PM',  sh: 14, sm: 0,  eh: 17, em: 0 },
+    { start: '8:30 PM',  end: '10:00 PM', sh: 20, sm: 30, eh: 22, em: 0 },
+  ] : [
+    { start: '8:00 AM',  end: '11:00 AM', sh: 8,  sm: 0,  eh: 11, em: 0 },
+    { start: '2:00 PM',  end: '5:00 PM',  sh: 14, sm: 0,  eh: 17, em: 0 },
+    { start: '8:30 PM',  end: '10:00 PM', sh: 20, sm: 30, eh: 22, em: 0 },
+  ];
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────
+function toMin(h, m) { return h * 60 + m; }
+
+function currentSessionIdx(isWeekend) {
+  const now = new Date();
+  const cur = toMin(now.getHours(), now.getMinutes());
+  const defs = getSessionDefs(isWeekend);
+  for (let i = 0; i < defs.length; i++) {
+    if (cur >= toMin(defs[i].sh, defs[i].sm) && cur < toMin(defs[i].eh, defs[i].em)) return i;
+  }
+  return -1;
+}
+
+function sessionStatus(isWeekend) {
+  const now = new Date();
+  const cur = toMin(now.getHours(), now.getMinutes());
+  const defs = getSessionDefs(isWeekend);
+
+  for (let i = 0; i < defs.length; i++) {
+    const s = toMin(defs[i].sh, defs[i].sm);
+    const e = toMin(defs[i].eh, defs[i].em);
+    if (cur >= s && cur < e) {
+      return `Session ${i + 1} active · ${e - cur}m left`;
+    }
+    if (i < defs.length - 1) {
+      const ns = toMin(defs[i + 1].sh, defs[i + 1].sm);
+      if (cur >= e && cur < ns) return `Break · Session ${i + 2} in ${ns - cur}m`;
+    }
+  }
+
+  const lastEnd = toMin(defs[2].eh, defs[2].em);
+  if (cur >= lastEnd) return 'Done for today 🌙';
+  return `First session at ${defs[0].start}`;
+}
+
+// ─── DOM builders ─────────────────────────────────────────────────
+function makeSubBlock(subId, sessionIdx, isWeekend) {
+  const meta = SUBJECT_META[subId];
+  const t = getSessionDefs(isWeekend)[sessionIdx];
+  const div = document.createElement('div');
+  div.className = 'sub-block';
+  div.dataset.session = sessionIdx;
+  div.style.setProperty('--c', `var(${meta.cssVar})`);
+  div.innerHTML = `
+    <div class="sub-inner">
+      <div class="sub-info">
+        <div class="sub-name">${meta.label}<span class="now-label">← now</span></div>
+        <div class="sub-time">${t.start} – ${t.end}</div>
+        <div class="sub-note">Past Paper Practise</div>
+      </div>
+      <div class="tags"><span class="tag tag-learn">Study</span></div>
+    </div>
+  `;
+  return div;
+}
+
+function makeGap(icon, label, time) {
+  const div = document.createElement('div');
+  div.className = 'gap-block';
+  div.innerHTML = `
+    <span class="gap-icon">${icon}</span>
+    <span class="gap-label">${label}</span>
+    <span class="gap-time">${time}</span>
+  `;
+  return div;
+}
+
+// ─── Render today's card ───────────────────────────────────────────
+let renderedDay = -1;
+
+function render() {
+  const now = new Date();
+  const dow = now.getDay();
+
+  // Update header
+  document.getElementById('hdr-day').textContent  = DAY_NAMES[dow];
+  document.getElementById('hdr-date').textContent = now.toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  if (renderedDay === dow) return; // Don't re-build DOM if same day
+  renderedDay = dow;
+
+  const isWeekend = (dow === 0 || dow === 6);
+  const daySubs   = SCHEDULE[dow];
+
+  const wrap = document.getElementById('day-wrap');
+  wrap.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'day-card' + (isWeekend ? ' weekend' : '');
+  card.innerHTML = `
+    <div class="day-header">
+      <span class="day-name">${DAY_NAMES[dow]}</span>
+      <span class="day-range">${isWeekend ? '10 AM – 10 PM' : '8 AM – 10 PM'}</span>
+    </div>
+    <div class="blocks" id="today-blocks"></div>
+  `;
+  wrap.appendChild(card);
+
+  const blocks = card.querySelector('#today-blocks');
+
+  blocks.appendChild(makeSubBlock(daySubs[0], 0, isWeekend));
+  blocks.appendChild(makeGap('🌤️', 'Lunch & free time', isWeekend ? '1:00 – 2:00 PM' : '11:00 AM – 2:00 PM'));
+  blocks.appendChild(makeSubBlock(daySubs[1], 1, isWeekend));
+  blocks.appendChild(makeGap('☕', 'Afternoon break', '5:00 – 7:00 PM'));
+  blocks.appendChild(makeGap('🍽️', 'Dinner', '7:00 – 8:00 PM'));
+  if (dow === 5) {
+    blocks.appendChild(makeGap('🎉', 'Free time — you earned it', '8:30 – 10:00 PM'));
+  } else {
+    blocks.appendChild(makeSubBlock(daySubs[2], 2, isWeekend));
+  }
+  blocks.appendChild(makeGap('🌙', 'Wind down & sleep', '10:00 PM →'));
+
+  document.getElementById('footer-note').textContent =
+    'Auto-updates each day at midnight · CIE iGCSE Syllabus';
+}
+
+// ─── Live clock + active session highlight ─────────────────────────
+function tick() {
+  const now = new Date();
+  const dow = now.getDay();
+  const isWeekend = (dow === 0 || dow === 6);
+
+  // Re-render card when day flips
+  if (renderedDay !== dow) render();
+
+  // Clock
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('live-time').textContent = `${hh}:${mm}:${ss}`;
+
+  // Badge
+  document.getElementById('session-now').textContent = sessionStatus(isWeekend);
+
+  // Highlight active block
+  const activeIdx = currentSessionIdx(isWeekend);
+  document.querySelectorAll('.sub-block').forEach(el => {
+    el.classList.toggle('active-session', parseInt(el.dataset.session) === activeIdx);
+  });
+}
+
+// ─── Boot ──────────────────────────────────────────────────────────
+render();
+tick();
+setInterval(tick, 1000);
+</script>
+
+</body>
+</html>
